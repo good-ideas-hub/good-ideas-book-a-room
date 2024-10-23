@@ -23,6 +23,6 @@ class Event extends Model
 
     public function bookBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id');
+        return $this->belongsTo(User::class, 'book_by');
     }
 }
