@@ -80,6 +80,16 @@ class CalendarWidget extends FullCalendarWidget
                             'to' => Carbon::parse($arguments['event']['end'])->format('Y-m-d H:i:00'),
                         ]);
                     }
+                    else {
+                        $form->fill([
+                            'room_id' => $event->room_id,
+                            'name' => $event->name,
+                            'book_by' => $event->book_by,
+                            'from' => $event->from,
+                            'to' => $event->to,
+                            'expected_participants' => $event->expected_participants,
+                        ]);
+                    }
                 }),
             Actions\DeleteAction::make(),
         ];
