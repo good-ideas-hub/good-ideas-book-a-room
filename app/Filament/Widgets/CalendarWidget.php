@@ -70,7 +70,17 @@ class CalendarWidget extends FullCalendarWidget
                         'to' => Carbon::parse($arguments['end'])->format('Y-m-d H:i:00'),
                     ]);
                 }),
-            Actions\EditAction::make(),
+            Actions\EditAction::make()
+                ->mountUsing(function (Form $form, array $arguments, Event $event) {
+                    if ($arguments) {
+                        $form->fill([
+                            'name' => $event->name,
+                            'expected_participants' => $event->expected_participants,
+                            'from' => Carbon::parse($arguments['event']['start'])->format('Y-m-d H:i:00'),
+                            'to' => Carbon::parse($arguments['event']['end'])->format('Y-m-d H:i:00'),
+                        ]);
+                    }
+                }),
             Actions\DeleteAction::make(),
         ];
     }
