@@ -3,9 +3,12 @@
 namespace App\Filament\Widgets;
 
 use App\Filament\Resources\EventResource;
+use Carbon\Carbon;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 use App\Models\Event;
 use Illuminate\Database\Eloquent\Model;
+use Saade\FilamentFullCalendar\Actions;
+use Filament\Forms\Form;
 
 class CalendarWidget extends FullCalendarWidget
 {
@@ -47,5 +50,20 @@ class CalendarWidget extends FullCalendarWidget
     public function getFormSchema(): array
     {
         return EventResource::getFormSchema();
+    }
+
+    protected function modalActions(): array
+    {
+        return [
+            Actions\CreateAction::make()
+                ->mountUsing(function (Form $form, array $arguments) {
+                    $form->fill([
+                        'from' => Carbon::parse($arguments['start'])->format('Y-m-d H:i:00'),
+                        'to' => Carbon::parse($arguments['end'])->format('Y-m-d H:i:00'),
+                    ]);
+                }),
+            Actions\EditAction::make(),
+            Actions\DeleteAction::make(),
+        ];
     }
 }
