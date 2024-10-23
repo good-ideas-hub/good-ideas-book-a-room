@@ -16,33 +16,38 @@ class EventResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function getFormSchema(): array
+    {
+        return [
+            Forms\Components\Select::make('room_id')
+                ->relationship('room', 'name')
+                ->required()
+                ->native(false)
+                ->searchable(),
+            Forms\Components\TextInput::make('name'),
+            Forms\Components\Select::make('book_by')
+                ->relationship('bookBy', 'name')
+                ->default(auth()->id())
+                ->required()
+                ->native(false)
+                ->searchable(),
+            Forms\Components\DateTimePicker::make('from')
+                ->required()
+                ->default(now()),
+            Forms\Components\DateTimePicker::make('to')
+                ->required()
+                ->default(now()),
+            Forms\Components\TextInput::make('expected_participants')
+                ->numeric()
+                ->minValue(0)
+                ->required(),
+        ];
+    }
+
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\Select::make('room_id')
-                    ->relationship('room', 'name')
-                    ->required()
-                    ->native(false)
-                    ->searchable(),
-                Forms\Components\TextInput::make('name'),
-                Forms\Components\Select::make('book_by')
-                    ->relationship('bookBy', 'name')
-                    ->default(auth()->id())
-                    ->required()
-                    ->native(false)
-                    ->searchable(),
-                Forms\Components\DateTimePicker::make('from')
-                    ->required()
-                    ->default(now()),
-                Forms\Components\DateTimePicker::make('to')
-                    ->required()
-                    ->default(now()),
-                Forms\Components\TextInput::make('expected_participants')
-                    ->numeric()
-                    ->minValue(0)
-                    ->required(),
-            ])
+            ->schema(static::getFormSchema())
             ->columns(1);
     }
 
