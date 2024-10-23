@@ -59,10 +59,10 @@ class EventResource extends Resource
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('bookBy.name'),
                 Tables\Columns\TextColumn::make('from')
-                    ->dateTime('Y-m-d h:i')
+                    ->dateTime('Y-m-d H:i')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('to')
-                    ->dateTime('Y-m-d h:i')
+                    ->dateTime('Y-m-d H:i')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('expected_participants')
                     ->numeric(),
