@@ -8,6 +8,7 @@ class Room extends Model
 {
     protected $fillable = [
         'name',
+        'color',
         'is_available',
         'description',
     ];

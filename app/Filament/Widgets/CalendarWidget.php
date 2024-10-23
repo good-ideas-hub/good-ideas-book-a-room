@@ -6,6 +6,8 @@ use App\Filament\Resources\EventResource;
 use Carbon\Carbon;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 use App\Models\Event;
+use App\Models\Room;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Saade\FilamentFullCalendar\Actions;
 use Filament\Forms\Form;
@@ -33,12 +35,18 @@ class CalendarWidget extends FullCalendarWidget
             ->where('from', '>=', $info['start'])
             ->where('to', '<=', $info['end'])
             ->get()
-            ->map(fn (Event $event) => [
-                'id' => $event['id'],
-                'title' => $event['name'],
-                'start' => $event['from'],
-                'end' => $event['to'],
-            ])
+            ->map(function (Event $event) {
+                $bookBy = User::find($event['book_by'])->name;
+                $roomName = Room::find($event['room_id'])->name;
+                return [
+                    'id' => $event['id'],
+                    'title' => $event['name']." (by $bookBy @$roomName)",
+                    'start' => $event['from'],
+                    'end' => $event['to'],
+                    'backgroundColor' => Room::find($event['room_id'])->color,
+                    'borderColor' => Room::find($event['room_id'])->color,
+                ];
+            })
             ->toArray();
     }
 

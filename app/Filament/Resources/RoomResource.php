@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\RoomResource\Pages;
 use App\Models\Room;
 use Filament\Forms;
+use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -22,6 +23,9 @@ class RoomResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required(),
+                ColorPicker::make('color')
+                    ->hsl()
+                    ->regex('/^hsl\(\s*(\d+)\s*,\s*(\d*(?:\.\d+)?%)\s*,\s*(\d*(?:\.\d+)?%)\)$/'),
                 Forms\Components\Checkbox::make('is_available')
                     ->label('Available?'),
                 Forms\Components\Textarea::make('description'),
