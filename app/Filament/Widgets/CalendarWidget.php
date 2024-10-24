@@ -66,6 +66,7 @@ class CalendarWidget extends FullCalendarWidget
         return [
             Actions\CreateAction::make()
                 ->modalHeading('新增預約')
+                ->hidden(auth()->user()->is_blocked)
                 ->mountUsing(function (Form $form, array $arguments) {
                     if ($arguments) {
                         $form->fill([
@@ -76,6 +77,7 @@ class CalendarWidget extends FullCalendarWidget
                 }),
             Actions\EditAction::make()
                 ->modalHeading('編輯預約')
+                ->hidden(auth()->user()->is_blocked)
                 ->mountUsing(function (Form $form, array $arguments, Event $event) {
                     if ($arguments) {
                         $form->fill([
@@ -97,7 +99,8 @@ class CalendarWidget extends FullCalendarWidget
                     }
                 }),
             Actions\DeleteAction::make()
-                ->modalHeading('刪除預約'),
+                ->modalHeading('刪除預約')
+                ->hidden(auth()->user()->is_blocked),
         ];
     }
 
