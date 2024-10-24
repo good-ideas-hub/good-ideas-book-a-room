@@ -7,6 +7,7 @@ use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -41,6 +42,17 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
+                Tables\Columns\CheckboxColumn::make('is_admin')
+                    ->visible(auth()->user()->is_admin)
+                    ->disabled(fn($record) => $record->is(auth()->user()))
+                    ->afterStateUpdated(function ($record, $state) {
+                        $record->is_admin = $state;
+                        $record->save();
+                        Notification::make()
+                            ->title('Success')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->filters([
                 //
@@ -66,8 +78,23 @@ class UserResource extends Resource
     {
         return [
             'index' => Pages\ListUsers::route('/'),
-//            'create' => Pages\CreateUser::route('/create'),
-//            'edit' => Pages\EditUser::route('/{record}/edit'),
+            //            'create' => Pages\CreateUser::route('/create'),
+            //            'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()->is_admin;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->is_admin;
+    }
+
+    public static function canView($record): bool
+    {
+        return auth()->user()->is_admin;
     }
 }
