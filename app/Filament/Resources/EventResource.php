@@ -14,6 +14,10 @@ class EventResource extends Resource
 {
     protected static ?string $model = Event::class;
 
+    protected static ?string $navigationLabel = '預約';
+
+    protected static ?string $modelLabel = '預約';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function getFormSchema(): array

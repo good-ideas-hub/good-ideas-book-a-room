@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Saade\FilamentFullCalendar\Actions;
 use Filament\Forms\Form;
+use \Filament\Actions\Action;
 
 class CalendarWidget extends FullCalendarWidget
 {
@@ -64,6 +65,7 @@ class CalendarWidget extends FullCalendarWidget
     {
         return [
             Actions\CreateAction::make()
+                ->modalHeading('新增預約')
                 ->mountUsing(function (Form $form, array $arguments) {
                     $form->fill([
                         'from' => Carbon::parse($arguments['start'])->format('Y-m-d H:i:00'),
@@ -71,6 +73,7 @@ class CalendarWidget extends FullCalendarWidget
                     ]);
                 }),
             Actions\EditAction::make()
+                ->modalHeading('編輯預約')
                 ->mountUsing(function (Form $form, array $arguments, Event $event) {
                     if ($arguments) {
                         $form->fill([
@@ -91,7 +94,14 @@ class CalendarWidget extends FullCalendarWidget
                         ]);
                     }
                 }),
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->modalHeading('刪除預約'),
         ];
+    }
+
+    protected function viewAction(): Action
+    {
+        return Actions\ViewAction::make()
+            ->modalHeading('檢視預約');
     }
 }
