@@ -38,8 +38,9 @@ class RoomResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\ToggleColumn::make('is_available')
-                    ->label('Available?'),
+                Tables\Columns\IconColumn::make('is_available')
+                    ->label('Available?')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('description'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime('Y-m-d h:i')
@@ -48,16 +49,19 @@ class RoomResource extends Resource
                     ->dateTime('Y-m-d h:i')
                     ->sortable(),
             ])
+            ->recordUrl(fn ($record) => auth()->user()->is_admin ? RoomResource::getUrl('edit', ['record' => $record]) : null)
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->visible(auth()->user()->is_admin),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                ])
+                ->visible(auth()->user()->is_admin),
             ]);
     }
 
@@ -75,5 +79,15 @@ class RoomResource extends Resource
             'create' => Pages\CreateRoom::route('/create'),
             'edit' => Pages\EditRoom::route('/{record}/edit'),
         ];
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->is_admin;
+    }
+
+    public static function canView($record): bool
+    {
+        return auth()->user()->is_admin;
     }
 }
