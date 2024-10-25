@@ -34,7 +34,7 @@ class EventResource extends Resource
             Forms\Components\TextInput::make('name')
                 ->disabled(auth()->user()->is_blocked),
             Forms\Components\Select::make('book_by')
-                ->disabled(auth()->user()->is_blocked)
+                ->hidden(!auth()->user()->is_admin)
                 ->relationship('bookBy', 'name')
                 ->default(auth()->id())
                 ->required()
