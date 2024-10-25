@@ -27,6 +27,7 @@ class EventResource extends Resource
                 ->disabled(auth()->user()->is_blocked)
                 ->relationship('room', 'name')
                 ->required()
+                ->default(request()->get('room_id'))
                 ->native(false)
                 ->searchable()
                 ->preload(),
