@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Filament\Resources\EventResource;
 use Carbon\Carbon;
+use Filament\Support\View\Components\Modal;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 use App\Models\Event;
 use App\Models\Room;
@@ -53,7 +54,13 @@ class CalendarWidget extends FullCalendarWidget
 
     protected function headerActions(): array
     {
-        return [];
+        return [
+            Action::make('seeRooms')
+                ->label('看會議室配置')
+                ->modalContent(view('filament.pages.rooms'))
+                ->modalCancelAction(false)
+                ->modalSubmitAction(false),
+        ];
     }
 
     public function getFormSchema(): array
