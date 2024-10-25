@@ -28,7 +28,8 @@ class EventResource extends Resource
                 ->relationship('room', 'name')
                 ->required()
                 ->native(false)
-                ->searchable(),
+                ->searchable()
+                ->preload(),
             Forms\Components\TextInput::make('name')
                 ->disabled(auth()->user()->is_blocked),
             Forms\Components\Select::make('book_by')
