@@ -24,24 +24,30 @@ class EventResource extends Resource
     {
         return [
             Forms\Components\Select::make('room_id')
+                ->disabled(auth()->user()->is_blocked)
                 ->relationship('room', 'name')
                 ->required()
                 ->native(false)
                 ->searchable(),
-            Forms\Components\TextInput::make('name'),
+            Forms\Components\TextInput::make('name')
+                ->disabled(auth()->user()->is_blocked),
             Forms\Components\Select::make('book_by')
+                ->disabled(auth()->user()->is_blocked)
                 ->relationship('bookBy', 'name')
                 ->default(auth()->id())
                 ->required()
                 ->native(false)
                 ->searchable(),
             Forms\Components\DateTimePicker::make('from')
+                ->disabled(auth()->user()->is_blocked)
                 ->required()
                 ->default(now()),
             Forms\Components\DateTimePicker::make('to')
+                ->disabled(auth()->user()->is_blocked)
                 ->required()
                 ->default(now()),
             Forms\Components\TextInput::make('expected_participants')
+                ->disabled(auth()->user()->is_blocked)
                 ->numeric()
                 ->minValue(0)
                 ->required(),
@@ -75,12 +81,14 @@ class EventResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->hidden(auth()->user()->is_blocked),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                ])
+                    ->hidden(auth()->user()->is_blocked),
             ]);
     }
 

@@ -57,6 +57,17 @@ class UserResource extends Resource
                             ->success()
                             ->send();
                     }),
+                Tables\Columns\CheckboxColumn::make('is_blocked')
+                    ->visible(auth()->user()->is_admin)
+                    ->disabled(fn($record) => $record->is_admin)
+                    ->afterStateUpdated(function ($record, $state) {
+                        $record->is_blocked = $state;
+                        $record->save();
+                        Notification::make()
+                            ->title('Success')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->filters([
                 //
