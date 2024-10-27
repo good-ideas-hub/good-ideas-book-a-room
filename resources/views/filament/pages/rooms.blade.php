@@ -23,8 +23,10 @@
   >
     <span class="font-bold text-xs text-center">會議室 2 (中型)</span>
   </a>
-  <div class="flex items-center justify-center" style="grid-column: 8 / 9; grid-row: 1 / 5; background-color: #E9D1DD;">
-    <span class="font-bold text-xs text-center">豆芽房</span>
+  <div class="flex items-center justify-center" style="grid-column: 8 / 9; grid-row: 1 / 5; background-color: lightgray;">
+    <x-filament::link tooltip="🐈">
+      <span class="font-bold text-xs text-center">豆芽房</span>
+    </x-filament::link>
   </div>
   <a
     href="{{ \App\Filament\Resources\EventResource::getUrl('create', [
