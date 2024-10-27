@@ -5,10 +5,16 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\EventResource\Pages;
 use App\Models\Event;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class EventResource extends Resource
 {
@@ -76,7 +82,8 @@ class EventResource extends Resource
                 Tables\Columns\TextColumn::make('room.name')
                     ->label('會議室'),
                 Tables\Columns\TextColumn::make('name')
-                    ->label('名稱'),
+                    ->label('名稱')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('bookBy.name')
                     ->label('預訂人'),
                 Tables\Columns\TextColumn::make('from')
@@ -100,8 +107,38 @@ class EventResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                //
-            ])
+                SelectFilter::make('room_id')
+                    ->label('會議室')
+                    ->relationship('room', 'name')
+                    ->multiple()
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('book_by')
+                    ->label('預訂人')
+                    ->relationship('bookBy', 'name')
+                    ->multiple()
+                    ->searchable(),
+                Filter::make('from')
+                    ->form([
+                        DateTimePicker::make('from')
+                            ->label('開始時間')
+                            ->default(now()->format("Y-m-d 00:00:00"))
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query->when(
+                        $data['from'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('from', '>=', $date),
+                    )),
+                Filter::make('to')
+                    ->form([
+                        DateTimePicker::make('to')
+                            ->label('結束時間')
+                            ->default(now()->format("Y-m-d 23:59:59"))
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query->when(
+                        $data['to'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('to', '<=', $date),
+                    ))
+            ], layout: FiltersLayout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->hidden(auth()->user()->is_blocked),
