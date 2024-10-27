@@ -29,9 +29,11 @@ class UserResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('名字')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('email')
+                    ->label('Email')
                     ->email()
                     ->required()
                     ->maxLength(255),
@@ -43,10 +45,13 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('名字')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->label('Email')
                     ->searchable(),
                 Tables\Columns\CheckboxColumn::make('is_admin')
+                    ->label('管理員')
                     ->visible(auth()->user()->is_admin)
                     ->disabled(fn($record) => $record->is(auth()->user()))
                     ->afterStateUpdated(function ($record, $state) {
@@ -58,6 +63,7 @@ class UserResource extends Resource
                             ->send();
                     }),
                 Tables\Columns\CheckboxColumn::make('is_blocked')
+                    ->label('停權')
                     ->visible(auth()->user()->is_admin)
                     ->disabled(fn($record) => $record->is_admin)
                     ->afterStateUpdated(function ($record, $state) {
@@ -68,6 +74,14 @@ class UserResource extends Resource
                             ->success()
                             ->send();
                     }),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('建立時間')
+                    ->dateTime('Y-m-d h:i')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('更新時間')
+                    ->dateTime('Y-m-d h:i')
+                    ->sortable(),
             ])
             ->filters([
                 //

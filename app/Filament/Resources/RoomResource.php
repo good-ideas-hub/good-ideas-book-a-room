@@ -26,13 +26,16 @@ class RoomResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('名稱')
                     ->required(),
                 ColorPicker::make('color')
+                    ->label('顏色')
                     ->hsl()
                     ->regex('/^hsl\(\s*(\d+)\s*,\s*(\d*(?:\.\d+)?%)\s*,\s*(\d*(?:\.\d+)?%)\)$/'),
                 Forms\Components\Checkbox::make('is_available')
-                    ->label('Available?'),
-                Forms\Components\Textarea::make('description'),
+                    ->label('是否開放預約'),
+                Forms\Components\Textarea::make('description')
+                    ->label('備注'),
             ])
             ->columns(1);
     }
@@ -41,17 +44,13 @@ class RoomResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('名稱'),
                 Tables\Columns\IconColumn::make('is_available')
-                    ->label('Available?')
+                    ->label('是否開放預約')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('description'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime('Y-m-d h:i')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime('Y-m-d h:i')
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->label('備注'),
             ])
             ->recordUrl(fn ($record) => auth()->user()->is_admin ? RoomResource::getUrl('edit', ['record' => $record]) : null)
             ->filters([
