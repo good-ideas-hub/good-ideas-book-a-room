@@ -28,6 +28,8 @@ class CalendarWidget extends FullCalendarWidget
                 'right' => 'prev,next today',
             ],
             'slotDuration' => '00:30:00',
+            'selectable' => !auth()->user()->is_blocked,
+            'editable' => !auth()->user()->is_blocked,
         ];
     }
 
