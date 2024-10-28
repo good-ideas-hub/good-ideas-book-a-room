@@ -85,38 +85,40 @@ class CalendarWidget extends FullCalendarWidget
                     }
                     $form->fill();
                 }),
-            Actions\EditAction::make()
-                ->modalHeading('編輯預約')
-                ->hidden(auth()->user()->is_blocked)
-                ->mountUsing(function (Form $form, array $arguments, Event $event) {
-                    if ($arguments) {
-                        $form->fill([
-                            'name' => $event->name,
-                            'expected_participants' => $event->expected_participants,
-                            'from' => Carbon::parse($arguments['event']['start'])->format('Y-m-d H:i:00'),
-                            'to' => Carbon::parse($arguments['event']['end'])->format('Y-m-d H:i:00'),
-                        ]);
-                    }
-                    else {
-                        $form->fill([
-                            'room_id' => $event->room_id,
-                            'name' => $event->name,
-                            'book_by' => $event->book_by,
-                            'from' => $event->from,
-                            'to' => $event->to,
-                            'expected_participants' => $event->expected_participants,
-                        ]);
-                    }
-                }),
-            Actions\DeleteAction::make()
-                ->modalHeading('刪除預約')
-                ->hidden(auth()->user()->is_blocked),
         ];
     }
 
     protected function viewAction(): Action
     {
         return Actions\ViewAction::make()
-            ->modalHeading('檢視預約');
+            ->modalHeading('檢視預約')
+            ->modalFooterActions([
+                Actions\EditAction::make()
+                    ->modalHeading('編輯預約')
+                    ->hidden(fn(Event $record) => !EventResource::canEdit($record))
+                    ->mountUsing(function (Form $form, array $arguments, Event $event) {
+                        if ($arguments) {
+                            $form->fill([
+                                'name' => $event->name,
+                                'expected_participants' => $event->expected_participants,
+                                'from' => Carbon::parse($arguments['event']['start'])->format('Y-m-d H:i:00'),
+                                'to' => Carbon::parse($arguments['event']['end'])->format('Y-m-d H:i:00'),
+                            ]);
+                        }
+                        else {
+                            $form->fill([
+                                'room_id' => $event->room_id,
+                                'name' => $event->name,
+                                'book_by' => $event->book_by,
+                                'from' => $event->from,
+                                'to' => $event->to,
+                                'expected_participants' => $event->expected_participants,
+                            ]);
+                        }
+                    }),
+                Actions\DeleteAction::make()
+                    ->modalHeading('刪除預約')
+                    ->hidden(fn(Event $record) => !EventResource::canEdit($record))
+            ]);
     }
 }
