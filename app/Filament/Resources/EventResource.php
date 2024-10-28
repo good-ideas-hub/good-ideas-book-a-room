@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\EventResource\Pages;
 use App\Models\Event;
 use App\Models\Room;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
@@ -45,7 +46,8 @@ class EventResource extends Resource
                 ->disabled(auth()->user()->is_blocked),
             Forms\Components\Select::make('book_by')
                 ->label('預訂人')
-//                ->hidden(!auth()->user()->is_admin) // TODO 只有 admin 可以操作
+                ->default(auth()->id())
+                ->disabled(!auth()->user()->is_admin)
                 ->relationship('bookBy', 'name')
                 ->default(auth()->id())
                 ->required()

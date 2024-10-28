@@ -83,6 +83,7 @@ class CalendarWidget extends FullCalendarWidget
                             'to' => Carbon::parse($arguments['end'])->format('Y-m-d H:i:00'),
                         ]);
                     }
+                    $form->fill();
                 }),
             Actions\EditAction::make()
                 ->modalHeading('編輯預約')
