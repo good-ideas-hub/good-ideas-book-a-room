@@ -33,7 +33,6 @@ class EventResource extends Resource
         return [
             Forms\Components\Select::make('room_id')
                 ->label('會議室')
-                ->disabled(auth()->user()->is_blocked)
                 ->relationship('room', 'name')
                 ->options(Room::where('is_available', 1)->pluck('name', 'id'))
                 ->required()
@@ -42,8 +41,7 @@ class EventResource extends Resource
                 ->searchable()
                 ->preload(),
             Forms\Components\TextInput::make('name')
-                ->label('名稱')
-                ->disabled(auth()->user()->is_blocked),
+                ->label('名稱'),
             Forms\Components\Select::make('book_by')
                 ->label('預訂人')
                 ->default(auth()->id())
@@ -55,17 +53,14 @@ class EventResource extends Resource
                 ->searchable(),
             Forms\Components\DateTimePicker::make('from')
                 ->label('開始時間')
-                ->disabled(auth()->user()->is_blocked)
                 ->required()
                 ->default(now()),
             Forms\Components\DateTimePicker::make('to')
                 ->label('結束時間')
-                ->disabled(auth()->user()->is_blocked)
                 ->required()
                 ->default(now()),
             Forms\Components\TextInput::make('expected_participants')
                 ->label('預計參與人數')
-                ->disabled(auth()->user()->is_blocked)
                 ->numeric()
                 ->minValue(0)
                 ->required(),
@@ -169,5 +164,10 @@ class EventResource extends Resource
             'create' => Pages\CreateEvent::route('/create'),
             'edit' => Pages\EditEvent::route('/{record}/edit'),
         ];
+    }
+
+    public static function canEdit($record): bool
+    {
+        return !auth()->user()->is_blocked;
     }
 }
