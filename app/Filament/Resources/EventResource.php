@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EventResource\Pages;
 use App\Models\Event;
+use App\Models\Room;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
@@ -33,6 +34,7 @@ class EventResource extends Resource
                 ->label('會議室')
                 ->disabled(auth()->user()->is_blocked)
                 ->relationship('room', 'name')
+                ->options(Room::where('is_available', 1)->pluck('name', 'id'))
                 ->required()
                 ->default(request()->get('room_id'))
                 ->native(false)
