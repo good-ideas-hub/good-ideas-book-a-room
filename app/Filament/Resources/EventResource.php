@@ -168,6 +168,9 @@ class EventResource extends Resource
 
     public static function canEdit($record): bool
     {
-        return !auth()->user()->is_blocked;
+        if (auth()->user()->is_admin) {
+            return true;
+        }
+        return !auth()->user()->is_blocked && $record->book_by === auth()->id();
     }
 }
