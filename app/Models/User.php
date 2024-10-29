@@ -21,6 +21,7 @@ class User extends Authenticatable implements FilamentUser
      */
     protected $fillable = [
         'slack_id',
+        'slack_token',
         'name',
         'email',
         'password',

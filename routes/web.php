@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\SlackTokenRedirect;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
@@ -7,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->middleware(SlackTokenRedirect::class);
 
 Route::get('/auth/redirect/slack', function () {
     return Socialite::driver('slack')->redirect();
@@ -20,6 +21,7 @@ Route::get('/auth/callback/slack', function () {
         'email' => $slackUser->email,
     ], [
         'slack_id' => $slackUser->id,
+        'slack_token' => $slackUser->token,
         'name' => $slackUser->name,
         'password' => Hash::make($slackUser->email),
     ]);
