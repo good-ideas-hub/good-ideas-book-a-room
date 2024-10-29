@@ -9,6 +9,7 @@ use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Table;
 
 class RoomResource extends Resource
@@ -46,6 +47,8 @@ class RoomResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('名稱'),
+                ColorColumn::make('color')
+                    ->label('顏色'),
                 Tables\Columns\IconColumn::make('is_available')
                     ->label('是否開放預約')
                     ->boolean(),
