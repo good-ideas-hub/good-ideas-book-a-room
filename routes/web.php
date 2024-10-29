@@ -10,6 +10,13 @@ Route::get('/', function () {
     return view('welcome');
 })->middleware(SlackTokenRedirect::class);
 
+Route::get('/admin', function () {
+    if (!Auth::user()) {
+        return redirect('/');
+    }
+    return redirect('/admin');
+});
+
 Route::get('/admin/login', function () {
     if (config('app.env') == 'production') {
         return redirect('/');
