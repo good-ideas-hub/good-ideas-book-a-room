@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\SlackErrorNotifier;
 use App\Http\Middleware\SlackTokenRedirect;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -13,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(SlackTokenRedirect::class);
+        $middleware->append(SlackErrorNotifier::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

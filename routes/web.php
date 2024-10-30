@@ -6,6 +6,12 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
+//Route::get('/test-trigger-error', function () {
+//    abort(500, json_encode([
+//        'message' => 'An error occurred. Please try again later.'
+//    ]));
+//});
+
 Route::get('/', function () {
     return view('welcome');
 })->middleware(SlackTokenRedirect::class);
