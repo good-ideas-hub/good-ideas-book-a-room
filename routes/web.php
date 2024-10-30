@@ -24,14 +24,24 @@ Route::get('/auth/redirect/slack', function () {
 Route::get('/auth/callback/slack', function () {
     $slackUser = Socialite::driver('slack')->user();
 
-    $user = User::firstOrCreate([
-        'email' => $slackUser->email,
-    ], [
-        'slack_id' => $slackUser->id,
-        'slack_token' => $slackUser->token,
-        'name' => $slackUser->name,
-        'password' => Hash::make($slackUser->email),
-    ]);
+    $user = User::where('slack_id', $slackUser->getId())
+        ->orwhere('email', $slackUser->getEmail())
+        ->first();
+
+    if ($user) {
+        if (empty($user->slack_token)) {
+            $user->slack_token = $slackUser->token;
+            $user->save();
+        }
+    } else {
+        $user = User::create([
+            'slack_id' => $slackUser->id,
+            'slack_token' => $slackUser->token,
+            'name' => $slackUser->name,
+            'email' => $slackUser->email,
+            'password' => Hash::make($slackUser->email),
+        ]);
+    }
 
     Auth::login($user);
 
