@@ -6,9 +6,9 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
-Route::get('/test-trigger-error', function () {
-    throw new Error('MSG');
-});
+//Route::get('/test-trigger-error', function () {
+//    throw new Error('MSG');
+//});
 
 Route::get('/', function () {
     return view('welcome');
