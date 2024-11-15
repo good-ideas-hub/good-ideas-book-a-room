@@ -17,10 +17,12 @@ class SlackErrorNotifier
     {
         $response = $next($request);
 
-        if ($response->status() >= 500) {
+        if ($response->getStatusCode() >= 500) {
             $response->dt = date('Y-m-d H:i:s');
 
-            $this->sendErrorToSlack($request, $response);
+            if (config('app.env') === 'production') {
+                $this->sendErrorToSlack($request, $response);
+            }
         }
 
         return $response;
@@ -37,8 +39,9 @@ class SlackErrorNotifier
     protected function sendErrorToSlack($request, $response): void
     {
         $user = auth()->user();
-        $statusCode = $response->status();
+        $statusCode = $response->getStatusCode();
         $fullUrl = $request->fullUrl();
+        $errorMessage = $response->exception->getMessage();
         $traceString = $response->exception->getTraceAsString();
         $timestamp = now()->setTimezone('Asia/Taipei')->format('Y-m-d_H-i-s');
         $filename = "stack_trace_{$timestamp}.txt";
@@ -75,6 +78,15 @@ class SlackErrorNotifier
         }
 
         // Step 3: Complete the upload and share the file
+        $getStatusCodeEmoji = function ($host) {
+            if (config('app.env') === 'local') {
+                return 'large_yellow_circle';
+            } elseif ($host.startsWith('staging')) {
+                return 'large_orange_circle';
+            } else {
+                return 'alert';
+            }
+        };
         $completeUploadResponse = Http::withToken(config('services.slack.bot_token'))
             ->asForm()
             ->post('https://slack.com/api/files.completeUploadExternal', [
@@ -85,7 +97,7 @@ class SlackErrorNotifier
                     ],
                 ]),
                 'channel_id' => config('services.slack.channel_id'),
-                'initial_comment' => "Status code: :red_circle: {$statusCode}\nDatetime: {$response->dt}\nUser: ".($user ? $user->id : 'Guest')."\nFull URL: {$fullUrl}",
+                'initial_comment' => "Status code: :{$getStatusCodeEmoji($request->host)}: {$statusCode}\nDatetime: {$response->dt}\nUser: ".($user ? $user->id : 'Guest')."\nFull URL: {$fullUrl}"."\nError message: `{$errorMessage}`",
             ]);
 
         if (! $completeUploadResponse->ok()) {
