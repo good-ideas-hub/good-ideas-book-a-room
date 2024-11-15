@@ -14,13 +14,6 @@ Route::get('/', function () {
     return view('welcome');
 })->middleware(SlackTokenRedirect::class);
 
-Route::get('/admin/login', function () {
-    if (config('app.env') == 'production') {
-        return redirect('/');
-    }
-    return redirect('/admin/login');
-});
-
 Route::get('/auth/redirect/slack', function () {
     return Socialite::driver('slack')->redirect();
 });

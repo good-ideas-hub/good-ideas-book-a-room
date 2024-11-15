@@ -25,7 +25,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+//            ->login() // 在本地開發自己打開
             ->colors([
                 'primary' => '#23BE8C',
             ])
