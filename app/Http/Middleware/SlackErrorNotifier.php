@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class SlackErrorNotifier
@@ -81,7 +82,7 @@ class SlackErrorNotifier
         $getStatusCodeEmoji = function ($host) {
             if (config('app.env') === 'local') {
                 return 'large_yellow_circle';
-            } elseif ($host.startsWith('staging')) {
+            } elseif (Str::startsWith($host, 'staging')) {
                 return 'large_orange_circle';
             } else {
                 return 'alert';
