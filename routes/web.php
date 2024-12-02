@@ -14,6 +14,8 @@ Route::get('/', function () {
     return view('welcome');
 })->middleware(SlackTokenRedirect::class);
 
+Route::redirect('/login', '/')->name('login');
+
 Route::get('/auth/redirect/slack', function () {
     return Socialite::driver('slack')->redirect();
 });
