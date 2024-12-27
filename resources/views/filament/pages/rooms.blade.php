@@ -28,6 +28,12 @@
       <span class="font-bold text-xs text-center">豆芽房</span>
     </x-filament::link>
   </div>
+  <div
+    class="flex items-center justify-center"
+    style="grid-column: 9 / 13; grid-row: 3 / 8; background-color: lightgray;"
+  >
+    <span class="font-bold text-xs text-center">公共區</span>
+  </div>
   <a
     href="{{ \App\Filament\Resources\EventResource::getUrl('create', [
       'room_id' => 4
@@ -67,9 +73,24 @@
   <div class="flex items-center justify-center" style="grid-column: 2 / 9; grid-row: 5 / 25; background-color: #FFF3CC;">
     <span class="font-bold text-xs text-center">進駐區</span>
   </div>
-  <div class="flex items-center justify-center" style="grid-column: 9 / 13; grid-row: 3 / 25; background-color: #D0E2F3;">
-    <span class="font-bold text-xs text-center">公共區＆學員區</span>
-  </div>
+  <a
+    href="{{ \App\Filament\Resources\EventResource::getUrl('create', [
+      'room_id' => 9
+    ]) }}"
+    class="flex items-center justify-center"
+    style="grid-column: 9 / 11; grid-row: 8 / 25; background-color: #D0E2F3;"
+  >
+    <span class="font-bold text-xs text-center">投影活動區2</span>
+  </a>
+  <a
+    href="{{ \App\Filament\Resources\EventResource::getUrl('create', [
+      'room_id' => 8
+    ]) }}"
+    class="flex items-center justify-center"
+    style="grid-column: 11 / 13; grid-row: 8 / 25; background-color: #D0E2F3;"
+  >
+    <span class="font-bold text-xs text-center">投影活動區1</span>
+  </a>
   <a
     href="{{ \App\Filament\Resources\EventResource::getUrl('create', [
       'room_id' => 1
