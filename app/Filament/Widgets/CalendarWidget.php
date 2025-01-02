@@ -4,6 +4,9 @@ namespace App\Filament\Widgets;
 
 use App\Filament\Resources\EventResource;
 use Carbon\Carbon;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Support\View\Components\Modal;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 use App\Models\Event;
@@ -84,6 +87,20 @@ class CalendarWidget extends FullCalendarWidget
                         ]);
                     }
                     $form->fill();
+                })
+                ->using(function (CreateAction $action, array $data): Event {
+                    if (Event::isConflict($data)) {
+                        $roomName = Room::find($data['room_id'])->name;
+
+                        Notification::make('cantBook')
+                            ->title('該時段 '.$roomName.' 已有預約')
+                            ->danger()
+                            ->send();
+
+                        $action->halt();
+                    }
+
+                    return Event::create($data);
                 }),
         ];
     }
@@ -115,6 +132,22 @@ class CalendarWidget extends FullCalendarWidget
                                 'expected_participants' => $event->expected_participants,
                             ]);
                         }
+                    })
+                    ->using(function (EditAction $action, Event $record, array $data): Event {
+                        if (Event::isConflict($data)) {
+                            $roomName = Room::find($data['room_id'])->name;
+
+                            Notification::make('cantBook')
+                                ->title('該時段 '.$roomName.' 已有預約')
+                                ->danger()
+                                ->send();
+
+                            $action->halt();
+                        }
+
+                        $record->update($data);
+
+                        return $record;
                     }),
                 Actions\DeleteAction::make()
                     ->modalHeading('刪除預約')
