@@ -26,11 +26,16 @@ class Event extends Model
         return $this->belongsTo(User::class, 'book_by');
     }
 
-    public static function isConflict(array $newEvent): bool
+    public static function isConflict(array $newEvent, ?Event $record = null): bool
     {
-        return Event::where('room_id', $newEvent['room_id'])
+        $query = Event::where('room_id', $newEvent['room_id'])
             ->where('from', '<', $newEvent['to'])
-            ->where('to', '>', $newEvent['from'])
-            ->exists();
+            ->where('to', '>', $newEvent['from']);
+
+        if ($record) {
+            $query->where('id', '!=', $record->id);
+        }
+
+        return $query->exists();
     }
 }

@@ -134,7 +134,7 @@ class CalendarWidget extends FullCalendarWidget
                         }
                     })
                     ->using(function (EditAction $action, Event $record, array $data): Event {
-                        if (Event::isConflict($data)) {
+                        if (Event::isConflict($data, $record)) {
                             $roomName = Room::find($data['room_id'])->name;
 
                             Notification::make('cantBook')
