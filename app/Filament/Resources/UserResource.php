@@ -76,11 +76,11 @@ class UserResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('建立時間')
-                    ->dateTime('Y-m-d h:i')
+                    ->dateTime('Y-m-d H:i')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('更新時間')
-                    ->dateTime('Y-m-d h:i')
+                    ->dateTime('Y-m-d H:i')
                     ->sortable(),
             ])
             ->filters([

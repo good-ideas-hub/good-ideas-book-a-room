@@ -54,11 +54,11 @@ class EventResource extends Resource
             Forms\Components\DateTimePicker::make('from')
                 ->label('開始時間')
                 ->required()
-                ->default(now()),
+                ->default(now()->format('Y-m-d H:i:00')),
             Forms\Components\DateTimePicker::make('to')
                 ->label('結束時間')
                 ->required()
-                ->default(now()),
+                ->default(now()->format('Y-m-d H:i:00')),
             Forms\Components\TextInput::make('expected_participants')
                 ->label('預計參與人數')
                 ->numeric()
@@ -98,11 +98,11 @@ class EventResource extends Resource
                     ->numeric(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('建立時間')
-                    ->dateTime('Y-m-d h:i')
+                    ->dateTime('Y-m-d H:i')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('更新時間')
-                    ->dateTime('Y-m-d h:i')
+                    ->dateTime('Y-m-d H:i')
                     ->sortable(),
             ])
             ->filters([
