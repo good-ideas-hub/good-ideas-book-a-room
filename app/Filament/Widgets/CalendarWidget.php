@@ -3,19 +3,18 @@
 namespace App\Filament\Widgets;
 
 use App\Filament\Resources\EventResource;
-use Carbon\Carbon;
-use Filament\Actions\CreateAction;
-use Filament\Actions\EditAction;
-use Filament\Notifications\Notification;
-use Filament\Support\View\Components\Modal;
-use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 use App\Models\Event;
 use App\Models\Room;
 use App\Models\User;
+use Carbon\Carbon;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Saade\FilamentFullCalendar\Actions;
-use Filament\Forms\Form;
-use \Filament\Actions\Action;
+use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 
 class CalendarWidget extends FullCalendarWidget
 {
@@ -31,8 +30,8 @@ class CalendarWidget extends FullCalendarWidget
                 'right' => 'prev,next today',
             ],
             'slotDuration' => '00:30:00',
-            'selectable' => !auth()->user()->is_blocked,
-            'editable' => !auth()->user()->is_blocked,
+            'selectable' => ! auth()->user()->is_blocked,
+            'editable' => ! auth()->user()->is_blocked,
         ];
     }
 
@@ -45,6 +44,7 @@ class CalendarWidget extends FullCalendarWidget
             ->map(function (Event $event) {
                 $bookBy = User::find($event['book_by'])->name;
                 $roomName = Room::find($event['room_id'])->name;
+
                 return [
                     'id' => $event['id'],
                     'title' => $event['name']." (by $bookBy @$roomName)",
@@ -112,7 +112,7 @@ class CalendarWidget extends FullCalendarWidget
             ->modalFooterActions([
                 Actions\EditAction::make()
                     ->modalHeading('編輯預約')
-                    ->hidden(fn(Event $record) => !EventResource::canEdit($record))
+                    ->hidden(fn (Event $record) => ! EventResource::canEdit($record))
                     ->mountUsing(function (Form $form, array $arguments, Event $event) {
                         if ($arguments) {
                             $form->fill([
@@ -121,8 +121,7 @@ class CalendarWidget extends FullCalendarWidget
                                 'from' => Carbon::parse($arguments['event']['start'])->format('Y-m-d H:i:00'),
                                 'to' => Carbon::parse($arguments['event']['end'])->format('Y-m-d H:i:00'),
                             ]);
-                        }
-                        else {
+                        } else {
                             $form->fill([
                                 'room_id' => $event->room_id,
                                 'name' => $event->name,
@@ -151,7 +150,7 @@ class CalendarWidget extends FullCalendarWidget
                     }),
                 Actions\DeleteAction::make()
                     ->modalHeading('刪除預約')
-                    ->hidden(fn(Event $record) => !EventResource::canEdit($record))
+                    ->hidden(fn (Event $record) => ! EventResource::canEdit($record)),
             ]);
     }
 }
