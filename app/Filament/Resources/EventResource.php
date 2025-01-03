@@ -123,7 +123,7 @@ class EventResource extends Resource
                     ->form([
                         DateTimePicker::make('from')
                             ->label('開始時間')
-                            ->default(now()->format("Y-m-d 00:00:00"))
+                            ->default(today()->format("Y-m-d 00:00:00"))
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query->when(
                         $data['from'],
@@ -133,7 +133,7 @@ class EventResource extends Resource
                     ->form([
                         DateTimePicker::make('to')
                             ->label('結束時間')
-                            ->default(now()->format("Y-m-d 23:59:59"))
+                            ->default(today()->format("Y-m-d 23:59:59"))
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query->when(
                         $data['to'],
