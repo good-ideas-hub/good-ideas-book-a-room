@@ -5,9 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\EventResource\Pages;
 use App\Models\Event;
 use App\Models\Room;
-use App\Models\User;
 use Filament\Forms;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -45,7 +43,7 @@ class EventResource extends Resource
             Forms\Components\Select::make('book_by')
                 ->label('預訂人')
                 ->default(auth()->id())
-                ->disabled(!auth()->user()->is_admin)
+                ->disabled(! auth()->user()->is_admin)
                 ->relationship('bookBy', 'name')
                 ->default(auth()->id())
                 ->required()
@@ -123,7 +121,7 @@ class EventResource extends Resource
                     ->form([
                         DateTimePicker::make('from')
                             ->label('開始時間')
-                            ->default(today()->format("Y-m-d 00:00:00"))
+                            ->default(today()->format('Y-m-d 00:00:00')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query->when(
                         $data['from'],
@@ -133,12 +131,12 @@ class EventResource extends Resource
                     ->form([
                         DateTimePicker::make('to')
                             ->label('結束時間')
-                            ->default(today()->format("Y-m-d 23:59:59"))
+                            ->default(today()->format('Y-m-d 23:59:59')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query->when(
                         $data['to'],
                         fn (Builder $query, $date): Builder => $query->whereDate('to', '<=', $date),
-                    ))
+                    )),
             ], layout: FiltersLayout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -173,6 +171,7 @@ class EventResource extends Resource
         if (auth()->user()->is_admin) {
             return true;
         }
-        return !auth()->user()->is_blocked && $record->book_by === auth()->id();
+
+        return ! auth()->user()->is_blocked && $record->book_by === auth()->id();
     }
 }
