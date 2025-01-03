@@ -34,14 +34,31 @@ class Event extends Model
 
     public static function isConflict(array $newEvent, ?Event $record = null): bool
     {
-        $query = Event::where('room_id', $newEvent['room_id'])
-            ->where('from', '<', $newEvent['to'])
-            ->where('to', '>', $newEvent['from']);
+        if (array_key_exists('room_id', $newEvent)) {
+            $query = Event::where('room_id', $newEvent['room_id'])
+                ->whereNull('type')
+                ->where('from', '<', $newEvent['to'])
+                ->where('to', '>', $newEvent['from']);
 
-        if ($record) {
-            $query->where('id', '!=', $record->id);
+            if ($record) {
+                $query->where('id', '!=', $record->id);
+            }
+
+            return $query->exists();
         }
 
-        return $query->exists();
+        return false;
+    }
+
+    public static function isWantToKnow(Event|array $event): bool
+    {
+        if (is_array($event)) {
+            return array_key_exists('type', $event) && $event['type'] !== null;
+        }
+        if ($event instanceof Event) {
+            return $event->type !== null;
+        }
+
+        return false;
     }
 }

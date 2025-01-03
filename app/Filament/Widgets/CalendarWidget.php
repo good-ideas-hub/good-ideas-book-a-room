@@ -2,6 +2,8 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\EventType;
+use App\Enums\WantToKnowType;
 use App\Filament\Resources\EventResource;
 use App\Models\Event;
 use App\Models\Room;
@@ -10,7 +12,14 @@ use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Saade\FilamentFullCalendar\Actions;
@@ -43,15 +52,19 @@ class CalendarWidget extends FullCalendarWidget
             ->get()
             ->map(function (Event $event) {
                 $bookBy = User::find($event['book_by'])->name;
-                $roomName = Room::find($event['room_id'])->name;
+                $roomName = Room::find($event['room_id'])?->name ?? '';
 
                 return [
                     'id' => $event['id'],
-                    'title' => $event['name']." (by $bookBy @$roomName)",
+                    'title' => Event::isWantToKnow($event)
+                        ? $event['name']." (by $bookBy)"
+                        : $event['name']." (by $bookBy @$roomName)",
                     'start' => $event['from'],
                     'end' => $event['to'],
-                    'backgroundColor' => Room::find($event['room_id'])->color,
-                    'borderColor' => Room::find($event['room_id'])->color,
+                    'allDay' => Carbon::parse($event['from'])->format('H:i:s') === '00:00:00'
+                        && Carbon::parse($event['to'])->format('H:i:s') === '23:59:59',
+                    'backgroundColor' => Room::find($event['room_id'])?->color ?? 'black',
+                    'borderColor' => Room::find($event['room_id'])?->color ?? 'black',
                 ];
             })
             ->toArray();
@@ -68,17 +81,105 @@ class CalendarWidget extends FullCalendarWidget
         ];
     }
 
+    private static function isBookARoom(Get $get): bool
+    {
+        return $get('eventType') == EventType::BookARoom->value || $get('expected_participants') !== null;
+    }
+
+    private static function isWantToKnow(Get $get): bool
+    {
+        return $get('eventType') == EventType::WantToKnow->value || $get('type') !== null;
+    }
+
     public function getFormSchema(): array
     {
-        return EventResource::getFormSchema();
+        return [
+            // 預約空間
+            Select::make('room_id')
+                ->label('會議室')
+                ->relationship('room', 'name')
+                ->options(Room::where('is_available', 1)->pluck('name', 'id'))
+                ->required()
+                ->default(request()->get('room_id'))
+                ->native(false)
+                ->searchable()
+                ->preload()
+                ->visible(fn (Get $get) => static::isBookARoom($get)),
+            TextInput::make('name')
+                ->label('名稱')
+                ->visible(fn (Get $get) => static::isBookARoom($get)),
+            Select::make('book_by')
+                ->label('預訂人')
+                ->default(auth()->id())
+                ->disabled(! auth()->user()->is_admin)
+                ->relationship('bookBy', 'name')
+                ->default(auth()->id())
+                ->required()
+                ->native(false)
+                ->searchable()
+                ->preload()
+                ->visible(fn (Get $get) => static::isBookARoom($get)),
+            DateTimePicker::make('from')
+                ->label('開始時間')
+                ->required()
+                ->visible(fn (Get $get) => static::isBookARoom($get)),
+            DateTimePicker::make('to')
+                ->label('結束時間')
+                ->required()
+                ->visible(fn (Get $get) => static::isBookARoom($get)),
+            TextInput::make('expected_participants')
+                ->label('預計參與人數')
+                ->numeric()
+                ->minValue(0)
+                ->required()
+                ->visible(fn (Get $get) => static::isBookARoom($get)),
+
+            // ＃想知道嗎
+            Select::make('book_by')
+                ->label('稱呼')
+                ->default(auth()->id())
+                ->disabled(! auth()->user()->is_admin)
+                ->relationship('bookBy', 'name')
+                ->default(auth()->id())
+                ->required()
+                ->native(false)
+                ->searchable()
+                ->preload()
+                ->visible(fn (Get $get) => static::isWantToKnow($get)),
+            DatePicker::make('date')
+                ->label('日期')
+                ->required()
+                ->visible(fn (Get $get) => static::isWantToKnow($get)),
+            Select::make('type')
+                ->label('分類')
+                ->options(WantToKnowType::class)
+                ->required()
+                ->native(false)
+                ->visible(fn (Get $get) => static::isWantToKnow($get)),
+            TextInput::make('name')
+                ->label('題目')
+                ->required()
+                ->visible(fn (Get $get) => static::isWantToKnow($get)),
+        ];
     }
 
     protected function modalActions(): array
     {
         return [
             Actions\CreateAction::make()
-                ->modalHeading('新增預約')
+                ->modalHeading('你要...？')
                 ->hidden(auth()->user()->is_blocked)
+                ->form(function () {
+                    return [
+                        Radio::make('eventType')
+                            ->label('')
+                            ->options(EventType::class)
+                            ->required()
+                            ->dehydrated(false)
+                            ->live(),
+                        ...static::getFormSchema(),
+                    ];
+                })
                 ->mountUsing(function (Form $form, array $arguments) {
                     if ($arguments) {
                         $form->fill([
@@ -100,6 +201,14 @@ class CalendarWidget extends FullCalendarWidget
                         $action->halt();
                     }
 
+                    if (Event::isWantToKnow($data)) {
+                        return Event::create([
+                            ...$data,
+                            'from' => Carbon::parse($data['date'])->startOfDay()->format('Y-m-d H:i:s'),
+                            'to' => Carbon::parse($data['date'])->endOfDay()->format('Y-m-d H:i:s'),
+                        ]);
+                    }
+
                     return Event::create($data);
                 }),
         ];
@@ -109,28 +218,33 @@ class CalendarWidget extends FullCalendarWidget
     {
         return Actions\ViewAction::make()
             ->modalHeading('檢視預約')
+            ->mountUsing(function (Form $form, array $arguments, Event $event) {
+                $form->fill([
+                    'room_id' => $event->room_id,
+                    'name' => $event->name,
+                    'book_by' => $event->book_by,
+                    'date' => $event->from,
+                    'from' => $event->from,
+                    'to' => $event->to,
+                    'expected_participants' => $event->expected_participants,
+                    'type' => $event->type,
+                ]);
+            })
             ->modalFooterActions([
                 Actions\EditAction::make()
                     ->modalHeading('編輯預約')
                     ->hidden(fn (Event $record) => ! EventResource::canEdit($record))
                     ->mountUsing(function (Form $form, array $arguments, Event $event) {
-                        if ($arguments) {
-                            $form->fill([
-                                'name' => $event->name,
-                                'expected_participants' => $event->expected_participants,
-                                'from' => Carbon::parse($arguments['event']['start'])->format('Y-m-d H:i:00'),
-                                'to' => Carbon::parse($arguments['event']['end'])->format('Y-m-d H:i:00'),
-                            ]);
-                        } else {
-                            $form->fill([
-                                'room_id' => $event->room_id,
-                                'name' => $event->name,
-                                'book_by' => $event->book_by,
-                                'from' => $event->from,
-                                'to' => $event->to,
-                                'expected_participants' => $event->expected_participants,
-                            ]);
-                        }
+                        $form->fill([
+                            'room_id' => $event->room_id,
+                            'name' => $event->name,
+                            'book_by' => $event->book_by,
+                            'date' => $event->from,
+                            'from' => $event->from,
+                            'to' => $event->to,
+                            'expected_participants' => $event->expected_participants,
+                            'type' => $event->type,
+                        ]);
                     })
                     ->using(function (EditAction $action, Event $record, array $data): Event {
                         if (Event::isConflict($data, $record)) {
@@ -142,6 +256,16 @@ class CalendarWidget extends FullCalendarWidget
                                 ->send();
 
                             $action->halt();
+                        }
+
+                        if (Event::isWantToKnow($data)) {
+                            $record->update([
+                                'name' => $data['name'],
+                                'book_by' => $data['book_by'],
+                                'from' => Carbon::parse($data['date'])->startOfDay()->format('Y-m-d H:i:s'),
+                                'to' => Carbon::parse($data['date'])->endOfDay()->format('Y-m-d H:i:s'),
+                                'type' => $data['type'],
+                            ]);
                         }
 
                         $record->update($data);
