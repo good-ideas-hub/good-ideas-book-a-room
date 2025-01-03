@@ -50,7 +50,8 @@ class EventResource extends Resource
                 ->default(auth()->id())
                 ->required()
                 ->native(false)
-                ->searchable(),
+                ->searchable()
+                ->preload(),
             Forms\Components\DateTimePicker::make('from')
                 ->label('開始時間')
                 ->required()
@@ -116,7 +117,8 @@ class EventResource extends Resource
                     ->label('預訂人')
                     ->relationship('bookBy', 'name')
                     ->multiple()
-                    ->searchable(),
+                    ->searchable()
+                    ->preload(),
                 Filter::make('from')
                     ->form([
                         DateTimePicker::make('from')
