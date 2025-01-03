@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\WantToKnowType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -14,6 +15,11 @@ class Event extends Model
         'from',
         'to',
         'expected_participants',
+        'type',
+    ];
+
+    protected $casts = [
+        'type' => WantToKnowType::class,
     ];
 
     public function room(): BelongsTo
