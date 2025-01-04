@@ -97,7 +97,7 @@ class SlackErrorNotifier
                         'title' => $filename,
                     ],
                 ]),
-                'channel_id' => config('services.slack.channel_id'),
+                'book_a_room_channel_id' => config('services.slack.book_a_room_channel_id'),
                 'initial_comment' => "Status code: :{$getStatusCodeEmoji($request->host)}: {$statusCode}\nDatetime: {$response->dt}\nUser: ".($user ? $user->id : 'Guest')."\nFull URL: {$fullUrl}"."\nError message: `{$errorMessage}`",
             ]);
 

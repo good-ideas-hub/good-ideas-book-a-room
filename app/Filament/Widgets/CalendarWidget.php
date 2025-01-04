@@ -14,7 +14,6 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -22,6 +21,7 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Http;
 use Saade\FilamentFullCalendar\Actions;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 
@@ -202,11 +202,31 @@ class CalendarWidget extends FullCalendarWidget
                     }
 
                     if (Event::isWantToKnow($data)) {
-                        return Event::create([
+                        $newEvent = Event::create([
                             ...$data,
                             'from' => Carbon::parse($data['date'])->startOfDay()->format('Y-m-d H:i:s'),
                             'to' => Carbon::parse($data['date'])->endOfDay()->format('Y-m-d H:i:s'),
                         ]);
+
+                        if ($newEvent) {
+                            Http::withToken(config('services.slack.bot_token'))
+                                ->asJson()
+                                ->post('https://slack.com/api/chat.postMessage', [
+                                    'channel' => config('services.slack.want_to_know_channel_id'),
+                                    'blocks' => [
+                                        [
+                                            'type' => 'section',
+                                            'text' => [
+                                                'type' => 'mrkdwn',
+                                                'text' => "稱呼： {$newEvent->bookBy->name}\n日期： ".\Carbon\Carbon::parse($newEvent->from)->format('Y/m/d')."\n 類別： {$newEvent->type->getLabel()}\n題目： {$newEvent->name}
+                                                ",
+                                            ],
+                                        ],
+                                    ],
+                                ]);
+                        }
+
+                        return $newEvent;
                     }
 
                     return Event::create($data);

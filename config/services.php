@@ -34,7 +34,8 @@ return [
         'redirect' => env('SLACK_REDIRECT_URI'),
         'webhook_url' => env('SLACK_WEBHOOK_URL'),
         'bot_token' => env('SLACK_BOT_TOKEN'),
-        'channel_id' => env('SLACK_BOOK_A_ROOM_CHANNEL_ID'),
+        'book_a_room_channel_id' => env('SLACK_BOOK_A_ROOM_CHANNEL_ID'),
+        'want_to_know_channel_id' => env('SLACK_WANT_TO_KNOW_CHANNEL_ID'),
         'scopes' => ['identity.basic', 'files:write', 'files:write:user'],
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
