@@ -63,4 +63,9 @@ class Event extends Model
 
         return false;
     }
+
+    public function scopeDisplayUserName(): string
+    {
+        return $this->speaker ?? $this->bookBy->name ?? '那個不能說的人';
+    }
 }

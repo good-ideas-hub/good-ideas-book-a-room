@@ -51,7 +51,7 @@ class CalendarWidget extends FullCalendarWidget
             ->where('to', '<=', $info['end'])
             ->get()
             ->map(function (Event $event) {
-                $bookBy = User::find($event['book_by'])->name;
+                $bookBy = $event->displayUserName();
                 $roomName = Room::find($event['room_id'])?->name ?? '';
 
                 return [
@@ -228,7 +228,7 @@ class CalendarWidget extends FullCalendarWidget
                 $form->fill([
                     'room_id' => $event->room_id,
                     'name' => $event->name,
-                    'book_by' => $event->book_by,
+                    'book_by' => $event->speaker ?? $event->book_by,
                     'date' => $event->from,
                     'from' => $event->from,
                     'to' => $event->to,
@@ -239,7 +239,7 @@ class CalendarWidget extends FullCalendarWidget
             ->modalFooterActions([
                 Actions\EditAction::make()
                     ->modalHeading('編輯預約')
-                    ->hidden(fn (Event $record) => ! EventResource::canEdit($record))
+                    ->hidden(fn (Event $record) => ! EventResource::canEdit($record) || $record->speaker)
                     ->mountUsing(function (Form $form, array $arguments, Event $event) {
                         $form->fill([
                             'room_id' => $event->room_id,
