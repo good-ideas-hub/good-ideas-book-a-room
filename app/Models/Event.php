@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\WantToKnowType;
+use App\Services\EventService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -12,6 +13,7 @@ class Event extends Model
         'room_id',
         'name',
         'book_by',
+        'speaker',
         'from',
         'to',
         'expected_participants',
