@@ -8,6 +8,7 @@ use App\Filament\Resources\EventResource;
 use App\Models\Event;
 use App\Models\Room;
 use App\Models\User;
+use App\Services\EventService;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -21,7 +22,6 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Http;
 use Saade\FilamentFullCalendar\Actions;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 
@@ -209,21 +209,7 @@ class CalendarWidget extends FullCalendarWidget
                         ]);
 
                         if ($newEvent) {
-                            Http::withToken(config('services.slack.bot_token'))
-                                ->asJson()
-                                ->post('https://slack.com/api/chat.postMessage', [
-                                    'channel' => config('services.slack.want_to_know_channel_id'),
-                                    'blocks' => [
-                                        [
-                                            'type' => 'section',
-                                            'text' => [
-                                                'type' => 'mrkdwn',
-                                                'text' => "稱呼： {$newEvent->bookBy->name}\n日期： ".\Carbon\Carbon::parse($newEvent->from)->format('Y/m/d')."\n 類別： {$newEvent->type->getLabel()}\n題目： {$newEvent->name}
-                                                ",
-                                            ],
-                                        ],
-                                    ],
-                                ]);
+                            EventService::sendNewEventNotificationToSlack($newEvent);
                         }
 
                         return $newEvent;
