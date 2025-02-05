@@ -39,8 +39,9 @@ class Event extends Model
         if (array_key_exists('room_id', $newEvent)) {
             $query = Event::where('room_id', $newEvent['room_id'])
                 ->whereNull('type')
-                ->whereBetween('from', [$newEvent['from'], $newEvent['to']])
-                ->orWhereBetween('to', [$newEvent['from'], $newEvent['to']]);
+                ->whereDate('from', '=', $newEvent['from'])
+                ->where('from', '<', $newEvent['from'])
+                ->where('to', '>', $newEvent['to']);
 
             if ($record) {
                 $query->where('id', '!=', $record->id);
