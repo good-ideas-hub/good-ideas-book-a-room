@@ -14,7 +14,7 @@ class CreateEvent extends CreateRecord
 
     protected function handleRecordCreation(array $data): \Illuminate\Database\Eloquent\Model
     {
-        if (Event::isConflict($data)) {
+        if (Event::isOverlap($data)) {
             $roomName = Room::find($data['room_id'])->name;
 
             Notification::make('cantBook')

@@ -34,7 +34,7 @@ class Event extends Model
         return $this->belongsTo(User::class, 'book_by');
     }
 
-    public static function isConflict(array $newEvent, ?Event $record = null): bool
+    public static function isOverlap(array $newEvent, ?Event $record = null): bool
     {
         if (array_key_exists('room_id', $newEvent)) {
             $query = Event::where('room_id', $newEvent['room_id'])

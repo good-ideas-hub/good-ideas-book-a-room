@@ -31,7 +31,7 @@ class EditEvent extends EditRecord
 
     protected function handleRecordUpdate(Event|Model $record, array $data): Model
     {
-        if (Event::isConflict($data, $record)) {
+        if (Event::isOverlap($data, $record)) {
             $roomName = Room::find($data['room_id'])->name;
 
             Notification::make('cantBook')
