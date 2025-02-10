@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\WantToKnowType;
 use App\Models\Event;
+use App\Models\User;
 use App\Services\EventService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -33,7 +34,7 @@ class EventController extends Controller
 
         $newEvent = Event::create([
             ...$validatedData,
-            'book_by' => 666, // from google sheet
+            'book_by' => User::where('name', 'admin')->first()->id,
             'from' => Carbon::parse($validatedData['date'])->format('Y-m-d 00:00:00'),
             'to' => Carbon::parse($validatedData['date'])->format('Y-m-d 00:00:00'),
         ]);
