@@ -41,3 +41,12 @@ test('events not overlap: same from and to, different room_id', function () {
     ];
     expect(Event::isOverlap($data))->toBeFalse();
 });
+
+test('events not overlap: same time and room_id, different date', function () {
+    $data = [
+        'from' => '3025-02-11 08:00:00',
+        'to' => '3025-02-11 19:00:00',
+        'room_id' => 1,
+    ];
+    expect(Event::isOverlap($data))->toBeFalse();
+});
