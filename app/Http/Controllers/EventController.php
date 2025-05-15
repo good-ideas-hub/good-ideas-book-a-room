@@ -21,9 +21,12 @@ class EventController extends Controller
         try {
             $validatedData = $request->validate([
                 'speaker' => 'required|string|max:255',
-                'date' => 'required|string|date',
-                'type' => ['required', new Enum(WantToKnowType::class)],
+                'date' => 'nullable|string|date',
+                'from' => 'nullable|string|date_format:Y-m-d H:i:s',
+                'to' => 'nullable|string|date_format:Y-m-d H:i:s',
+                'type' => ['nullable', new Enum(WantToKnowType::class)],
                 'name' => 'required|string|max:255',
+                'room_id' => 'nullable|integer',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
