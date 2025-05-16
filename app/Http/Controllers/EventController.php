@@ -35,13 +35,20 @@ class EventController extends Controller
             ], 400);
         }
 
-        $newEvent = Event::create(array_merge($validatedData, [
-            'book_by' => User::where('name', 'admin')->first()->id,
-            'from' => isset($validatedData['from']) ? $validatedData['from'] : Carbon::parse($validatedData['date'])->format('Y-m-d 00:00:00'),
-            'to' => isset($validatedData['to']) ? $validatedData['to'] : Carbon::parse($validatedData['date'])->format('Y-m-d 00:00:00'),
-        ]));
+        try {
+            $newEvent = Event::create(array_merge($validatedData, [
+                'book_by' => User::where('name', 'admin')->first()->id,
+                'from' => isset($validatedData['from']) ? $validatedData['from'] : Carbon::parse($validatedData['date'])->format('Y-m-d 00:00:00'),
+                'to' => isset($validatedData['to']) ? $validatedData['to'] : Carbon::parse($validatedData['date'])->format('Y-m-d 00:00:00'),
+            ]));
 
-        EventService::sendNewEventNotificationToSlack($newEvent);
+            EventService::sendNewEventNotificationToSlack($newEvent);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => '建立活動失敗',
+                'message' => $e->getMessage()
+            ], 500);
+        }
 
         return response()->json([
             'message' => 'Event created successfully!',
