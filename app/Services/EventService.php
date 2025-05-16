@@ -18,7 +18,7 @@ class EventService
                         'type' => 'section',
                         'text' => [
                             'type' => 'mrkdwn',
-                            'text' => '稱呼： '.($event->displayUserName())."\n日期： ".\Carbon\Carbon::parse($event->from)->format('Y/m/d')."\n類別： {$event->type->getLabel()}\n題目： {$event->name}",
+                            'text' => '稱呼： '.($event->displayUserName())."\n日期： ".\Carbon\Carbon::parse($event->from)->format('Y/m/d')."\n類別： ".($event->type ? $event->type->getLabel() : '一般活動')."\n題目： {$event->name}",
                         ],
                     ],
                 ],
