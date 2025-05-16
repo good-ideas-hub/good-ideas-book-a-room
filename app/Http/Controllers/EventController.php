@@ -21,12 +21,12 @@ class EventController extends Controller
         try {
             $validatedData = $request->validate([
                 'speaker' => 'required|string|max:255',
-                'date' => 'nullable|string|date',
-                'from' => 'nullable|string|date_format:Y-m-d H:i:s',
-                'to' => 'nullable|string|date_format:Y-m-d H:i:s',
-                'type' => ['nullable', new Enum(WantToKnowType::class)],
+                'date' => ['nullable', 'sometimes', 'string', 'date'],
+                'from' => ['nullable', 'sometimes', 'string', 'date_format:Y-m-d H:i:s'],
+                'to' => ['nullable', 'sometimes', 'string', 'date_format:Y-m-d H:i:s'],
+                'type' => ['nullable', 'sometimes', new Enum(WantToKnowType::class)],
                 'name' => 'required|string|max:255',
-                'room_id' => 'nullable|integer',
+                'room_id' => ['nullable', 'sometimes', 'integer'],
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -35,12 +35,11 @@ class EventController extends Controller
             ], 400);
         }
 
-        $newEvent = Event::create([
-            ...$validatedData,
+        $newEvent = Event::create(array_merge($validatedData, [
             'book_by' => User::where('name', 'admin')->first()->id,
             'from' => Carbon::parse($validatedData['date'])->format('Y-m-d 00:00:00'),
             'to' => Carbon::parse($validatedData['date'])->format('Y-m-d 00:00:00'),
-        ]);
+        ]));
 
         EventService::sendNewEventNotificationToSlack($newEvent);
 
