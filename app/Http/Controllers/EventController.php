@@ -42,7 +42,11 @@ class EventController extends Controller
                 'to' => isset($validatedData['to']) ? $validatedData['to'] : Carbon::parse($validatedData['date'])->format('Y-m-d 00:00:00'),
             ]));
 
-            EventService::sendNewEventNotificationToSlack($newEvent);
+            if (Event::isWantToKnow($validatedData)) {
+                EventService::sendNewEventNotificationToSlack($newEvent);
+            } else {
+                EventService::sendBookARoomNotificationToSlack($newEvent);
+            }
         } catch (\Exception $e) {
             return response()->json([
                 'error' => '建立活動失敗',

@@ -215,7 +215,13 @@ class CalendarWidget extends FullCalendarWidget
                         return $newEvent;
                     }
 
-                    return Event::create($data);
+                    $newEvent = Event::create($data);
+                    
+                    if ($newEvent && !Event::isWantToKnow($data)) {
+                        EventService::sendBookARoomNotificationToSlack($newEvent);
+                    }
+
+                    return $newEvent;
                 }),
         ];
     }
@@ -275,6 +281,13 @@ class CalendarWidget extends FullCalendarWidget
                         }
 
                         $record->update($data);
+
+                        // 發送編輯事件的 Slack 通知
+                        if (Event::isWantToKnow($data)) {
+                            EventService::sendUpdatedEventNotificationToSlack($record);
+                        } else {
+                            EventService::sendUpdatedBookARoomNotificationToSlack($record);
+                        }
 
                         return $record;
                     }),
