@@ -37,8 +37,8 @@ class EventController extends Controller
 
         $newEvent = Event::create(array_merge($validatedData, [
             'book_by' => User::where('name', 'admin')->first()->id,
-            'from' => Carbon::parse($validatedData['date'])->format('Y-m-d 00:00:00'),
-            'to' => Carbon::parse($validatedData['date'])->format('Y-m-d 00:00:00'),
+            'from' => isset($validatedData['from']) ? $validatedData['from'] : Carbon::parse($validatedData['date'])->format('Y-m-d 00:00:00'),
+            'to' => isset($validatedData['to']) ? $validatedData['to'] : Carbon::parse($validatedData['date'])->format('Y-m-d 00:00:00'),
         ]));
 
         EventService::sendNewEventNotificationToSlack($newEvent);
